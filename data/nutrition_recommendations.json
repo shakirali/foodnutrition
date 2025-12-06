@@ -1,0 +1,255 @@
+{
+    "1": {
+      "male": {
+        "energy_mj": 3.2,
+        "energy_kcal": 765,
+        "protein_g": 14.5,
+        "fat_g_max": null,
+        "saturated_fat_g_max": null,
+        "polyunsat_fat_g": null,
+        "monounsat_fat_g": null,
+        "carbs_g_min": null,
+        "free_sugars_g_max": null,
+        "salt_g_max": 2.0,
+        "fibre_g": null
+      },
+      "female": {
+        "energy_mj": 3.0,
+        "energy_kcal": 717,
+        "protein_g": 14.5,
+        "fat_g_max": null,
+        "saturated_fat_g_max": null,
+        "polyunsat_fat_g": null,
+        "monounsat_fat_g": null,
+        "carbs_g_min": null,
+        "free_sugars_g_max": null,
+        "salt_g_max": 2.0,
+        "fibre_g": null
+      }
+    },
+    "2-3": {
+      "male": {
+        "energy_mj": 4.55,
+        "energy_kcal": 1088,
+        "protein_g": 14.5,
+        "fat_g_max": null,
+        "saturated_fat_g_max": null,
+        "polyunsat_fat_g": null,
+        "monounsat_fat_g": null,
+        "carbs_g_min": 145,
+        "free_sugars_g_max": 15,
+        "salt_g_max": 2.0,
+        "fibre_g": 15
+      },
+      "female": {
+        "energy_mj": 4.2,
+        "energy_kcal": 1004,
+        "protein_g": 14.5,
+        "fat_g_max": null,
+        "saturated_fat_g_max": null,
+        "polyunsat_fat_g": null,
+        "monounsat_fat_g": null,
+        "carbs_g_min": 134,
+        "free_sugars_g_max": 13,
+        "salt_g_max": 3.0,
+        "fibre_g": 15
+      }
+    },
+    "4-6": {
+      "male": {
+        "energy_mj": 6.2,
+        "energy_kcal": 1482,
+        "protein_g": 19.7,
+        "fat_g_max": 58,
+        "saturated_fat_g_max": 18,
+        "polyunsat_fat_g": 11,
+        "monounsat_fat_g": 21,
+        "carbs_g_min": 198,
+        "free_sugars_g_max": 20,
+        "salt_g_max": "3.0-5.0",
+        "fibre_g": 20
+      },
+      "female": {
+        "energy_mj": 5.8,
+        "energy_kcal": 1378,
+        "protein_g": 19.7,
+        "fat_g_max": 54,
+        "saturated_fat_g_max": 17,
+        "polyunsat_fat_g": 10,
+        "monounsat_fat_g": 20,
+        "carbs_g_min": 184,
+        "free_sugars_g_max": 18,
+        "salt_g_max": "3.0-5.0",
+        "fibre_g": 20
+      }
+    },
+    "7-10": {
+      "male": {
+        "energy_mj": 7.6,
+        "energy_kcal": 1817,
+        "protein_g": 28.3,
+        "fat_g_max": 71,
+        "saturated_fat_g_max": 22,
+        "polyunsat_fat_g": 13,
+        "monounsat_fat_g": 26,
+        "carbs_g_min": 242,
+        "free_sugars_g_max": 24,
+        "salt_g_max": 5.0,
+        "fibre_g": 25
+      },
+      "female": {
+        "energy_mj": 7.1,
+        "energy_kcal": 1703,
+        "protein_g": 28.3,
+        "fat_g_max": 66,
+        "saturated_fat_g_max": 21,
+        "polyunsat_fat_g": 12,
+        "monounsat_fat_g": 25,
+        "carbs_g_min": 227,
+        "free_sugars_g_max": 23,
+        "salt_g_max": 6.0,
+        "fibre_g": 25
+      }
+    },
+    "11-14": {
+      "male": {
+        "energy_mj": 10.5,
+        "energy_kcal": 2500,
+        "protein_g": 42.1,
+        "fat_g_max": 97,
+        "saturated_fat_g_max": 31,
+        "polyunsat_fat_g": 18,
+        "monounsat_fat_g": 36,
+        "carbs_g_min": 333,
+        "free_sugars_g_max": 33,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      },
+      "female": {
+        "energy_mj": 8.4,
+        "energy_kcal": 2000,
+        "protein_g": 41.2,
+        "fat_g_max": 78,
+        "saturated_fat_g_max": 24,
+        "polyunsat_fat_g": 14,
+        "monounsat_fat_g": 29,
+        "carbs_g_min": 267,
+        "free_sugars_g_max": 27,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      }
+    },
+    "15-18": {
+      "male": {
+        "energy_mj": 10.5,
+        "energy_kcal": 2500,
+        "protein_g": 55.2,
+        "fat_g_max": 97,
+        "saturated_fat_g_max": 31,
+        "polyunsat_fat_g": 18,
+        "monounsat_fat_g": 36,
+        "carbs_g_min": 333,
+        "free_sugars_g_max": 33,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      },
+      "female": {
+        "energy_mj": 8.4,
+        "energy_kcal": 2000,
+        "protein_g": 45.0,
+        "fat_g_max": 78,
+        "saturated_fat_g_max": 24,
+        "polyunsat_fat_g": 14,
+        "monounsat_fat_g": 29,
+        "carbs_g_min": 267,
+        "free_sugars_g_max": 27,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      }
+    },
+    "19-64": {
+      "male": {
+        "energy_mj": 10.5,
+        "energy_kcal": 2500,
+        "protein_g": 55.5,
+        "fat_g_max": 97,
+        "saturated_fat_g_max": 31,
+        "polyunsat_fat_g": 18,
+        "monounsat_fat_g": 36,
+        "carbs_g_min": 333,
+        "free_sugars_g_max": 33,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      },
+      "female": {
+        "energy_mj": 8.4,
+        "energy_kcal": 2000,
+        "protein_g": 45.0,
+        "fat_g_max": 78,
+        "saturated_fat_g_max": 24,
+        "polyunsat_fat_g": 14,
+        "monounsat_fat_g": 29,
+        "carbs_g_min": 267,
+        "free_sugars_g_max": 27,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      }
+    },
+    "65-74": {
+      "male": {
+        "energy_mj": 9.8,
+        "energy_kcal": 2342,
+        "protein_g": 53.3,
+        "fat_g_max": 91,
+        "saturated_fat_g_max": 29,
+        "polyunsat_fat_g": 17,
+        "monounsat_fat_g": 34,
+        "carbs_g_min": 312,
+        "free_sugars_g_max": 31,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      },
+      "female": {
+        "energy_mj": 8.0,
+        "energy_kcal": 1912,
+        "protein_g": 46.5,
+        "fat_g_max": 74,
+        "saturated_fat_g_max": 23,
+        "polyunsat_fat_g": 14,
+        "monounsat_fat_g": 28,
+        "carbs_g_min": 255,
+        "free_sugars_g_max": 26,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      }
+    },
+    "75+": {
+      "male": {
+        "energy_mj": 9.6,
+        "energy_kcal": 2294,
+        "protein_g": 53.3,
+        "fat_g_max": 89,
+        "saturated_fat_g_max": 28,
+        "polyunsat_fat_g": 17,
+        "monounsat_fat_g": 33,
+        "carbs_g_min": 306,
+        "free_sugars_g_max": 31,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      },
+      "female": {
+        "energy_mj": 7.7,
+        "energy_kcal": 1840,
+        "protein_g": 46.5,
+        "fat_g_max": 72,
+        "saturated_fat_g_max": 23,
+        "polyunsat_fat_g": 13,
+        "monounsat_fat_g": 27,
+        "carbs_g_min": 245,
+        "free_sugars_g_max": 25,
+        "salt_g_max": 6.0,
+        "fibre_g": 30
+      }
+    }
+  }
+  
