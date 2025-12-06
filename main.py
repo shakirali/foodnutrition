@@ -63,12 +63,14 @@ async def main():
         # Create the primary agent with LLM configuration
         agent = NutritionAdvisorAgent(
             llm=ChatBot(
-                llm_provider=AppConfig.DEFAULT_LLM_PROVIDER
+                llm_provider=AppConfig.DEFAULT_LLM_PROVIDER,
+                model=AppConfig.DEFAULT_LLM_MODEL
             )
         )
         
         print("✓ Agent initialized successfully!")
         print("✓ Using default LLM provider:", AppConfig.DEFAULT_LLM_PROVIDER)
+        print("✓ Using default LLM model:", AppConfig.DEFAULT_LLM_MODEL)
         
         # Start conversation loop
         await run_conversation_loop(agent)

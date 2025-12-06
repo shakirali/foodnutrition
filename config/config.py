@@ -18,6 +18,7 @@ class AppConfig:
     DEFAULT_LLM_PROVIDER: str = os.getenv("DEFAULT_LLM_PROVIDER", "openai")  # Default LLM provider
     DEFAULT_LLM_API_KEY: Optional[str] = os.getenv("DEFAULT_LLM_API_KEY") or os.getenv("OPENAI_API_KEY")  # Default LLM API key
     DEFAULT_LLM_TEMPERATURE: float = float(os.getenv("DEFAULT_LLM_TEMPERATURE", "0.7"))  # Default LLM temperature
+    DEFAULT_LLM_MODEL: str = os.getenv("DEFAULT_LLM_MODEL", "gpt-4o-mini")  # Default LLM model
     
     # Agent Configuration
     AGENT_NAME: str = "Nutrition Advisor"
@@ -61,6 +62,7 @@ class AppConfig:
 Configuration Summary:
   - Agent Name: {cls.AGENT_NAME}
   - Default LLM Provider: {cls.DEFAULT_LLM_PROVIDER}
+  - Default LLM Model: {cls.DEFAULT_LLM_MODEL}
   - Default LLM API Key: {'Set' if cls.DEFAULT_LLM_API_KEY else 'Not set'}
   - Data Directory: {cls.DATA_DIR}
   - Memory Enabled: {cls.MEMORY_ENABLED}
