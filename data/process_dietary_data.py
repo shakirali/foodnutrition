@@ -1,7 +1,7 @@
 """Process dietary requirements JSON data (minerals, vitamins, nutrition) into searchable documents."""
 import json
 from pathlib import Path
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 
 def get_age_group(age: int) -> str:
@@ -52,9 +52,6 @@ def create_unified_document(
     nutrition: Dict
 ) -> Dict:
     """Create a unified document combining all three datasets for an age group and gender."""
-    
-    # Build searchable text with all nutrients
-    nutrient_parts = []
     
     # Add minerals
     mineral_text = []
