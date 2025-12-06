@@ -46,6 +46,9 @@ data/*.zip
 data/*.csv
 !data/.gitkeep
 
+# Vector database (ChromaDB)
+data/vector_db/
+
 # Logs
 *.log
 logs/
