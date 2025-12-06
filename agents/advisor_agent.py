@@ -6,6 +6,7 @@ Primary LLM Agent
 from pydantic import Field
 from spoon_ai.agents.toolcall import ToolCallAgent
 from spoon_ai.tools import ToolManager
+from agents.tools.nutrition_lookup_tool import NutritionLookupTool
 
 
 class NutritionAdvisorAgent(ToolCallAgent):
@@ -65,6 +66,10 @@ class NutritionAdvisorAgent(ToolCallAgent):
     
     max_steps: int = 10
     
-    # Tools will be added here as they are implemented
-    available_tools: ToolManager = Field(default_factory=lambda: ToolManager([]))
+    # Tools for nutrition lookup
+    available_tools: ToolManager = Field(
+        default_factory=lambda: ToolManager([
+            NutritionLookupTool()
+        ])
+    )
 

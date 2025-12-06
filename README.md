@@ -10,6 +10,7 @@ Built with [SpoonOS agentic architecture](https://xspoonai.github.io/), featurin
 - **Daily Diet Analysis**: Track and analyze your breakfast, lunch, and dinner intake
 - **Nutritional Gap Detection**: Compare your actual intake with recommended dietary requirements
 - **Food Recommendations**: Receive suggestions for foods that improve nutritional balance
+- **Nutrition Lookup**: Query USDA FoodData Central database using RAG (Retrieval-Augmented Generation)
 - **Dish Comparison**: Compare different dishes based on nutritional composition
 - **Local Store Search**: Find nearby shops and supermarkets for recommended foods (coming soon)
 
@@ -23,12 +24,12 @@ The application follows the **xspoon agentic architecture**, consisting of:
 - Calls sub-agents/tools as needed
 - Stores user profile and preferences in memory
 
-### Sub-Agents / Tools (Planned)
-1. **Nutrition Lookup Tool**: Queries USDA FoodData Central dataset
-2. **Dietary Requirements Tool**: Fetches recommended nutrient intake based on age and gender
-3. **Recommendation Agent**: Suggests alternative foods to improve deficient nutrients
-4. **Comparison Agent**: Compares dishes nutritionally
-5. **Local Store Search Tool**: Finds nearby shops and supermarkets
+### Sub-Agents / Tools
+1. **Nutrition Lookup Tool** ✅: Queries USDA FoodData Central dataset using RAG
+2. **Dietary Requirements Tool** (Planned): Fetches recommended nutrient intake based on age and gender
+3. **Recommendation Agent** (Planned): Suggests alternative foods to improve deficient nutrients
+4. **Comparison Agent** (Planned): Compares dishes nutritionally
+5. **Local Store Search Tool** (Planned): Finds nearby shops and supermarkets
 
 ## 📋 Prerequisites
 
@@ -66,6 +67,22 @@ The application follows the **xspoon agentic architecture**, consisting of:
    DEFAULT_LLM_API_KEY=your-api-key-here
    DEFAULT_LLM_TEMPERATURE=0.7
    ```
+
+5. **Set up RAG system** (one-time setup):
+   ```bash
+   python scripts/setup_rag.py
+   ```
+   
+   This will:
+   - Process the USDA FoodData Central JSON file (340 food items)
+   - Generate embeddings for all food items using sentence-transformers (local, no API needed)
+   - Create a vector database using ChromaDB
+   - Store the indexed data in `data/vector_db/`
+   
+   **Note**: 
+   - The first run may take a few minutes to download the embedding model (`all-MiniLM-L6-v2`) and generate embeddings. Subsequent runs will be faster as the model is cached.
+   - If the vector database already exists, you'll be prompted to re-index. This is useful if you update the USDA data file.
+   - The setup script automatically handles metadata size limits by storing full food data separately and loading it on demand.
 
 ## ⚙️ Configuration
 
@@ -117,7 +134,16 @@ python3 main.py
 
 4. **Recommendations**: Receive personalized food suggestions
 
-5. **Local Sourcing** (optional): Ask to find local stores for recommended foods
+5. **Nutrition Lookup**: Ask questions like:
+   - "What are the nutrients in an apple?"
+   - "Find high protein foods"
+   - "What foods are rich in iron?"
+   - "Show me foods with high calcium"
+   - "What are the nutritional values of eggs?"
+   
+   The agent will use the RAG system to search the USDA database and return detailed nutritional information.
+
+6. **Local Sourcing** (optional): Ask to find local stores for recommended foods
 
 ### Commands
 
@@ -129,17 +155,25 @@ python3 main.py
 ```
 foodnutrition/
 ├── agents/
-│   └── advisor_agent.py      # Primary NutritionAdvisorAgent class
+│   ├── advisor_agent.py       # Primary NutritionAdvisorAgent class
+│   └── tools/
+│       └── nutrition_lookup_tool.py  # Nutrition lookup tool using RAG
 ├── config/
 │   ├── __init__.py
-│   └── config.py             # Application configuration
-├── data/                      # Data directory (for USDA dataset, user memory)
+│   └── config.py              # Application configuration
+├── data/
+│   ├── FoodData_Central_foundation_food_json_2025-04-24.json  # USDA dataset (340 food items)
+│   ├── process_usda_data.py   # Data processing for RAG (converts JSON to searchable documents)
+│   ├── vector_store.py        # ChromaDB vector store implementation (handles embeddings & search)
+│   └── vector_db/             # Vector database storage (created after setup, contains embeddings)
+├── scripts/
+│   └── setup_rag.py           # RAG setup script
 ├── tests/                     # Test files
 ├── main.py                    # Application entry point
 ├── requirements.txt           # Python dependencies
-├── .env.example                # Environment variables template
-├── .env                        # Your environment variables (not in git)
-└── README.md                   # This file
+├── .env.example               # Environment variables template
+├── .env                       # Your environment variables (not in git)
+└── README.md                  # This file
 ```
 
 ## 🔧 Development
@@ -155,23 +189,49 @@ pytest tests/
 
 - **`main.py`**: Entry point that initializes and runs the agent
 - **`agents/advisor_agent.py`**: Defines the `NutritionAdvisorAgent` class
+- **`agents/tools/nutrition_lookup_tool.py`**: Nutrition lookup tool using RAG
+- **`data/vector_store.py`**: ChromaDB vector store for nutrition data (handles full data loading from JSON)
+- **`data/process_usda_data.py`**: Processes USDA JSON into searchable documents
+- **`scripts/setup_rag.py`**: One-time setup script for RAG system
 - **`config/config.py`**: Manages application configuration and environment variables
+
+### RAG System Architecture
+
+The RAG (Retrieval-Augmented Generation) system uses:
+- **ChromaDB**: Local vector database for storing food embeddings
+- **Sentence Transformers**: Local embedding model (`all-MiniLM-L6-v2`) - no API calls needed
+- **Semantic Search**: Vector similarity search for finding relevant foods based on queries
+
+**Key Implementation Details**:
+- Food data is stored with lightweight metadata in ChromaDB
+- Full food data is loaded on-demand from the original JSON file to avoid metadata size limits
+- The system supports queries like "high protein foods", "foods rich in iron", or specific food names
 
 ## 📊 Data Sources
 
-The application uses (or will use):
+The application uses:
 
-- **USDA FoodData Central Foundation Foods Dataset**: [Download](https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_json_2025-04-24.zip)
-- **UK Government Dietary Recommendations**: [Reference](https://www.nutrition.org.uk/nutritional-information/nutrient-requirements/)
-- **Government Dietary Recommendations PDF**: [Download](https://assets.publishing.service.gov.uk/media/5a749fece5274a44083b82d8/government_dietary_recommendations.pdf)
+- **USDA FoodData Central Foundation Foods Dataset** ✅: Included in `data/` folder (340 food items)
+  - [Download Link](https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_json_2025-04-24.zip)
+  - Processed and indexed using RAG for semantic search
+  - Supports queries by food name, nutrient name, or nutritional properties
+  - Full nutritional data available for each food item (calories, protein, vitamins, minerals, etc.)
+- **UK Government Dietary Recommendations** (Planned): [Reference](https://www.nutrition.org.uk/nutritional-information/nutrient-requirements/)
+- **Government Dietary Recommendations PDF** (Planned): [Download](https://assets.publishing.service.gov.uk/media/5a749fece5274a44083b82d8/government_dietary_recommendations.pdf)
 
 ## 🛠️ Dependencies
 
 - `spoon-ai-sdk`: Core SpoonOS agentic architecture framework
 - `spoon-toolkits`: Extended toolkits (optional)
 - `python-dotenv`: Environment variable management
+- `chromadb`: Vector database for RAG (local storage, no external service needed)
+- `sentence-transformers`: Local embedding generation (no API needed, downloads model on first use)
+- `pandas`: Data processing
+- `numpy`: Numerical operations
 
 See `requirements.txt` for the complete list.
+
+**Note**: All RAG dependencies run locally - no external API calls are required for nutrition lookups.
 
 ## 🚧 Future Enhancements
 
@@ -180,7 +240,7 @@ See `requirements.txt` for the complete list.
 - [ ] User progress dashboard
 - [ ] Recipe recommendations based on deficiencies
 - [ ] Barcode scanning
-- [ ] Integration with USDA FoodData Central dataset
+- [x] Integration with USDA FoodData Central dataset (RAG implemented)
 - [ ] UK dietary requirements integration
 - [ ] Local store search functionality
 
