@@ -75,13 +75,14 @@ The application follows the **xspoon agentic architecture**, consisting of:
    
    This will:
    - Process the USDA FoodData Central JSON file (340 food items)
-   - Generate embeddings for all food items
+   - Generate embeddings for all food items using sentence-transformers (local, no API needed)
    - Create a vector database using ChromaDB
    - Store the indexed data in `data/vector_db/`
    
-   **Note**: The first run may take a few minutes to download the embedding model and generate embeddings. Subsequent runs will be faster as the model is cached.
-   
-   If the vector database already exists, you'll be prompted to re-index. This is useful if you update the USDA data file.
+   **Note**: 
+   - The first run may take a few minutes to download the embedding model (`all-MiniLM-L6-v2`) and generate embeddings. Subsequent runs will be faster as the model is cached.
+   - If the vector database already exists, you'll be prompted to re-index. This is useful if you update the USDA data file.
+   - The setup script automatically handles metadata size limits by storing full food data separately and loading it on demand.
 
 ## ⚙️ Configuration
 
@@ -137,7 +138,10 @@ python3 main.py
    - "What are the nutrients in an apple?"
    - "Find high protein foods"
    - "What foods are rich in iron?"
-   The agent will use the RAG system to search the USDA database.
+   - "Show me foods with high calcium"
+   - "What are the nutritional values of eggs?"
+   
+   The agent will use the RAG system to search the USDA database and return detailed nutritional information.
 
 6. **Local Sourcing** (optional): Ask to find local stores for recommended foods
 
@@ -158,10 +162,10 @@ foodnutrition/
 │   ├── __init__.py
 │   └── config.py              # Application configuration
 ├── data/
-│   ├── FoodData_Central_foundation_food_json_2025-04-24.json  # USDA dataset
-│   ├── process_usda_data.py   # Data processing for RAG
-│   ├── vector_store.py        # ChromaDB vector store implementation
-│   └── vector_db/             # Vector database storage (created after setup)
+│   ├── FoodData_Central_foundation_food_json_2025-04-24.json  # USDA dataset (340 food items)
+│   ├── process_usda_data.py   # Data processing for RAG (converts JSON to searchable documents)
+│   ├── vector_store.py        # ChromaDB vector store implementation (handles embeddings & search)
+│   └── vector_db/             # Vector database storage (created after setup, contains embeddings)
 ├── scripts/
 │   └── setup_rag.py           # RAG setup script
 ├── tests/                     # Test files
@@ -186,10 +190,22 @@ pytest tests/
 - **`main.py`**: Entry point that initializes and runs the agent
 - **`agents/advisor_agent.py`**: Defines the `NutritionAdvisorAgent` class
 - **`agents/tools/nutrition_lookup_tool.py`**: Nutrition lookup tool using RAG
-- **`data/vector_store.py`**: ChromaDB vector store for nutrition data
+- **`data/vector_store.py`**: ChromaDB vector store for nutrition data (handles full data loading from JSON)
 - **`data/process_usda_data.py`**: Processes USDA JSON into searchable documents
 - **`scripts/setup_rag.py`**: One-time setup script for RAG system
 - **`config/config.py`**: Manages application configuration and environment variables
+
+### RAG System Architecture
+
+The RAG (Retrieval-Augmented Generation) system uses:
+- **ChromaDB**: Local vector database for storing food embeddings
+- **Sentence Transformers**: Local embedding model (`all-MiniLM-L6-v2`) - no API calls needed
+- **Semantic Search**: Vector similarity search for finding relevant foods based on queries
+
+**Key Implementation Details**:
+- Food data is stored with lightweight metadata in ChromaDB
+- Full food data is loaded on-demand from the original JSON file to avoid metadata size limits
+- The system supports queries like "high protein foods", "foods rich in iron", or specific food names
 
 ## 📊 Data Sources
 
@@ -198,6 +214,8 @@ The application uses:
 - **USDA FoodData Central Foundation Foods Dataset** ✅: Included in `data/` folder (340 food items)
   - [Download Link](https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_json_2025-04-24.zip)
   - Processed and indexed using RAG for semantic search
+  - Supports queries by food name, nutrient name, or nutritional properties
+  - Full nutritional data available for each food item (calories, protein, vitamins, minerals, etc.)
 - **UK Government Dietary Recommendations** (Planned): [Reference](https://www.nutrition.org.uk/nutritional-information/nutrient-requirements/)
 - **Government Dietary Recommendations PDF** (Planned): [Download](https://assets.publishing.service.gov.uk/media/5a749fece5274a44083b82d8/government_dietary_recommendations.pdf)
 
@@ -206,12 +224,14 @@ The application uses:
 - `spoon-ai-sdk`: Core SpoonOS agentic architecture framework
 - `spoon-toolkits`: Extended toolkits (optional)
 - `python-dotenv`: Environment variable management
-- `chromadb`: Vector database for RAG (local storage)
-- `sentence-transformers`: Local embedding generation (no API needed)
+- `chromadb`: Vector database for RAG (local storage, no external service needed)
+- `sentence-transformers`: Local embedding generation (no API needed, downloads model on first use)
 - `pandas`: Data processing
 - `numpy`: Numerical operations
 
 See `requirements.txt` for the complete list.
+
+**Note**: All RAG dependencies run locally - no external API calls are required for nutrition lookups.
 
 ## 🚧 Future Enhancements
 
