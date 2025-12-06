@@ -1,0 +1,6 @@
+# SpoonOS for agentic architecture
+spoon-ai-sdk
+
+# Optional: Extended toolkits
+spoon-toolkits
+
