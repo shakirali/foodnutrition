@@ -42,6 +42,7 @@ venv.bak/
 
 # Vector database (ChromaDB)
 data/vector_db/
+data/dietary_vector_db/
 
 # Logs
 *.log

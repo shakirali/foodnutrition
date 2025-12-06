@@ -7,6 +7,7 @@ from pydantic import Field
 from spoon_ai.agents.toolcall import ToolCallAgent
 from spoon_ai.tools import ToolManager
 from agents.tools.nutrition_lookup_tool import NutritionLookupTool
+from agents.tools.dietary_requirements_tool import DietaryRequirementsTool
 
 
 class NutritionAdvisorAgent(ToolCallAgent):
@@ -25,10 +26,11 @@ class NutritionAdvisorAgent(ToolCallAgent):
         "AI-powered nutrition advisor that recommends locally available, "
         "economical, and nutrient-rich foods. Can help with:\n"
         "1. Collecting user profile (age, gender, dietary restrictions)\n"
-        "2. Analyzing daily nutritional intake\n"
-        "3. Recommending foods to improve nutritional balance\n"
-        "4. Comparing dishes nutritionally\n"
-        "5. Finding local stores for recommended foods"
+        "2. Looking up daily dietary requirements (minerals, vitamins, nutrition)\n"
+        "3. Analyzing daily nutritional intake\n"
+        "4. Recommending foods to improve nutritional balance\n"
+        "5. Comparing dishes nutritionally\n"
+        "6. Finding local stores for recommended foods"
     )
     
     system_prompt: str = """
@@ -47,6 +49,7 @@ class NutritionAdvisorAgent(ToolCallAgent):
        - What they ate for dinner
     
     3. Using tools to:
+       - Look up daily dietary requirements (minerals, vitamins, nutrition) based on age and gender
        - Look up nutritional information for foods
        - Compare user's intake with recommended dietary requirements
        - Generate personalized food recommendations
@@ -66,10 +69,11 @@ class NutritionAdvisorAgent(ToolCallAgent):
     
     max_steps: int = 10
     
-    # Tools for nutrition lookup
+    # Tools for nutrition lookup and dietary requirements
     available_tools: ToolManager = Field(
         default_factory=lambda: ToolManager([
-            NutritionLookupTool()
+            NutritionLookupTool(),
+            DietaryRequirementsTool()
         ])
     )
 
