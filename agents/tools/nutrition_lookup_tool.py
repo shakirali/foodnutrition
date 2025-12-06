@@ -3,6 +3,7 @@ from spoon_ai.tools.base import BaseTool
 from data.vector_store import NutritionVectorStore
 from pathlib import Path
 from typing import Optional
+from pydantic import PrivateAttr
 
 
 class NutritionLookupTool(BaseTool):
@@ -33,15 +34,30 @@ class NutritionLookupTool(BaseTool):
         "required": ["food_query"]
     }
     
-    def __init__(self, vector_store: Optional[NutritionVectorStore] = None):
-        super().__init__()
+    # Use PrivateAttr for internal implementation details
+    _vector_store: Optional[NutritionVectorStore] = PrivateAttr(default=None)
+    
+    def __init__(self, vector_store: Optional[NutritionVectorStore] = None, **kwargs):
+        super().__init__(**kwargs)
         if vector_store is None:
             # Initialize vector store if not provided
             data_dir = Path(__file__).parent.parent.parent / "data"
             vector_store_path = data_dir / "vector_db"
-            self.vector_store = NutritionVectorStore(vector_store_path)
+            json_path = data_dir / "FoodData_Central_foundation_food_json_2025-04-24.json"
+            self._vector_store = NutritionVectorStore(vector_store_path, json_path=json_path)
         else:
-            self.vector_store = vector_store
+            self._vector_store = vector_store
+    
+    @property
+    def vector_store(self) -> NutritionVectorStore:
+        """Get the vector store instance."""
+        if self._vector_store is None:
+            # Lazy initialization if somehow not set
+            data_dir = Path(__file__).parent.parent.parent / "data"
+            vector_store_path = data_dir / "vector_db"
+            json_path = data_dir / "FoodData_Central_foundation_food_json_2025-04-24.json"
+            self._vector_store = NutritionVectorStore(vector_store_path, json_path=json_path)
+        return self._vector_store
     
     async def execute(self, food_query: str, max_results: int = 5) -> str:
         """Execute the nutrition lookup."""
@@ -60,10 +76,13 @@ class NutritionLookupTool(BaseTool):
             
             for i, result in enumerate(results, 1):
                 metadata = result['metadata']
-                full_data = metadata.get('full_data', {})
+                fdc_id = metadata.get('fdc_id')
+                
+                # Load full data using FDC ID
+                full_data = self.vector_store.get_food_by_id(fdc_id) if fdc_id else {}
                 
                 # Extract key nutrients
-                nutrients = full_data.get('foodNutrients', [])
+                nutrients = full_data.get('foodNutrients', []) if full_data else []
                 
                 # Prioritize important nutrients for display
                 important_nutrients = {

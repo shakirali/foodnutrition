@@ -25,7 +25,7 @@ def setup_rag():
     
     print("Initializing vector store...")
     vector_store_path = data_dir / "vector_db"
-    vector_store = NutritionVectorStore(vector_store_path)
+    vector_store = NutritionVectorStore(vector_store_path, json_path=json_path)
     
     # Check if collection already has data
     existing_count = vector_store.get_collection_count()

@@ -1,5 +1,6 @@
 """Vector store for nutrition data using ChromaDB."""
 import chromadb
+import json
 from chromadb.config import Settings
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -7,16 +8,21 @@ from sentence_transformers import SentenceTransformer
 
 
 class NutritionVectorStore:
-    def __init__(self, persist_directory: Path, embedding_model: str = "all-MiniLM-L6-v2"):
+    def __init__(self, persist_directory: Path, embedding_model: str = "all-MiniLM-L6-v2", json_path: Optional[Path] = None):
         """
         Initialize vector store for nutrition data.
         
         Args:
             persist_directory: Where to store the vector database
             embedding_model: Sentence transformer model name (local, no API needed)
+            json_path: Path to original USDA JSON file for loading full_data (optional)
         """
         self.persist_directory = persist_directory
         self.persist_directory.mkdir(parents=True, exist_ok=True)
+        
+        # Store JSON path for loading full_data when needed
+        self.json_path = json_path
+        self._food_data_cache = None  # Cache for loaded food data
         
         # Initialize ChromaDB
         self.client = chromadb.PersistentClient(
@@ -78,8 +84,32 @@ class NutritionVectorStore:
         
         return formatted_results
     
+    def _load_food_data_cache(self):
+        """Lazy load food data from JSON file."""
+        if self._food_data_cache is not None:
+            return
+        
+        if self.json_path and self.json_path.exists():
+            try:
+                with open(self.json_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    foods = data.get('FoundationFoods', [])
+                    # Create a lookup dictionary by FDC ID
+                    self._food_data_cache = {str(food.get('fdcId')): food for food in foods}
+            except Exception as e:
+                print(f"Warning: Could not load food data cache: {e}")
+                self._food_data_cache = {}
+        else:
+            self._food_data_cache = {}
+    
     def get_food_by_id(self, fdc_id: str) -> Optional[Dict]:
         """Retrieve full food data by FDC ID."""
+        # Try to load from cache (original JSON)
+        self._load_food_data_cache()
+        if self._food_data_cache and str(fdc_id) in self._food_data_cache:
+            return self._food_data_cache[str(fdc_id)]
+        
+        # Fallback: try metadata (for backwards compatibility)
         results = self.collection.get(ids=[str(fdc_id)])
         if results['ids']:
             return results['metadatas'][0].get('full_data')
