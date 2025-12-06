@@ -66,10 +66,9 @@ def create_document(food_item: Dict) -> Dict:
             'description': description,
             'food_class': food_class,
             'category': category_desc,
-            # Note: full_data removed from metadata due to ChromaDB size limits
-            # Full data can be loaded from original JSON using fdc_id if needed
-        },
-        'full_data': food_item  # Store full data separately (not in metadata)
+            # Note: full_data is not stored here due to ChromaDB metadata size limits
+            # Full data is loaded on-demand from the original JSON file using fdc_id
+        }
     }
 
 

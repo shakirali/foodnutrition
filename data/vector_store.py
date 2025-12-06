@@ -103,16 +103,11 @@ class NutritionVectorStore:
             self._food_data_cache = {}
     
     def get_food_by_id(self, fdc_id: str) -> Optional[Dict]:
-        """Retrieve full food data by FDC ID."""
-        # Try to load from cache (original JSON)
+        """Retrieve full food data by FDC ID from the original JSON file."""
+        # Load from cache (original JSON file)
         self._load_food_data_cache()
         if self._food_data_cache and str(fdc_id) in self._food_data_cache:
             return self._food_data_cache[str(fdc_id)]
-        
-        # Fallback: try metadata (for backwards compatibility)
-        results = self.collection.get(ids=[str(fdc_id)])
-        if results['ids']:
-            return results['metadatas'][0].get('full_data')
         return None
     
     def get_collection_count(self) -> int:

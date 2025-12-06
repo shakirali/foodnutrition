@@ -28,7 +28,6 @@ class AppConfig:
     
     # Data Paths
     DATA_DIR: str = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
-    USDA_DATASET_PATH: Optional[str] = os.path.join(DATA_DIR, "usda_fooddata.json")
     
     # Memory Configuration
     MEMORY_ENABLED: bool = True
@@ -46,9 +45,8 @@ class AppConfig:
         Returns:
             bool: True if configuration is valid
         """
-        # TODO: Add validation logic as needed
-        # For now, we'll allow the app to run without API keys
-        # (they'll be required when specific features are used)
+        # Validation: API keys are optional at startup
+        # They will be required when specific features (LLM calls, Google search) are used
         return True
     
     @classmethod
