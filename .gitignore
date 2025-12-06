@@ -40,12 +40,6 @@ venv.bak/
 .env.local
 .env.*.local
 
-# Data files (large datasets)
-data/*.json
-data/*.zip
-data/*.csv
-!data/.gitkeep
-
 # Vector database (ChromaDB)
 data/vector_db/
 
