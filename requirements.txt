@@ -4,3 +4,6 @@ spoon-ai-sdk
 # Optional: Extended toolkits
 spoon-toolkits
 
+# Environment variable management
+python-dotenv
+
