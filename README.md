@@ -6,11 +6,14 @@ Built with [SpoonOS agentic architecture](https://xspoonai.github.io/), featurin
 
 ## 🎯 Features
 
+- **Web Interface** ✅: Modern, responsive web UI with real-time chat interface
+- **CLI Interface**: Command-line interface for terminal-based interactions
 - **Personalized Nutrition Guidance**: Get recommendations based on your age, gender, and dietary restrictions
 - **Daily Diet Analysis**: Track and analyze your breakfast, lunch, and dinner intake
 - **Nutritional Gap Detection**: Compare your actual intake with recommended dietary requirements
 - **Food Recommendations**: Receive suggestions for foods that improve nutritional balance
 - **Nutrition Lookup**: Query USDA FoodData Central database using RAG (Retrieval-Augmented Generation)
+- **Dietary Requirements Lookup**: Get age and gender-specific nutrient requirements
 - **Dish Comparison**: Compare different dishes based on nutritional composition
 - **Local Store Search**: Find nearby shops and supermarkets for recommended foods (coming soon)
 
@@ -65,6 +68,7 @@ The application follows the **xspoon agentic architecture**, consisting of:
    ```env
    DEFAULT_LLM_PROVIDER=openai
    DEFAULT_LLM_API_KEY=your-api-key-here
+   DEFAULT_LLM_MODEL=gpt-4o-mini
    DEFAULT_LLM_TEMPERATURE=0.7
    ```
 
@@ -92,6 +96,7 @@ The application uses environment variables for configuration. Create a `.env` fi
 |----------|-------------|---------|----------|
 | `DEFAULT_LLM_PROVIDER` | LLM provider (e.g., openai, anthropic) | `openai` | No |
 | `DEFAULT_LLM_API_KEY` | API key for LLM provider | - | Yes |
+| `DEFAULT_LLM_MODEL` | LLM model name | `gpt-4o-mini` | No |
 | `DEFAULT_LLM_TEMPERATURE` | Temperature for LLM responses (0.0-2.0) | `0.7` | No |
 | `GOOGLE_API_KEY` | Google API key for local store search | - | No* |
 | `GOOGLE_SEARCH_ENGINE_ID` | Google Search Engine ID | - | No* |
@@ -102,7 +107,41 @@ The application uses environment variables for configuration. Create a `.env` fi
 
 ## 💻 Usage
 
-Run the application:
+The application can be used in two ways:
+
+### Option 1: Web Interface (Recommended) 🌐
+
+Start the web server:
+
+```bash
+python web/run_server.py
+```
+
+Or using uvicorn directly:
+
+```bash
+uvicorn web.api:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Then open your browser and navigate to:
+- **Web Interface**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+**Web Interface Features:**
+- Modern, responsive chat interface with real-time messaging
+- Quick action buttons for common queries:
+  - Analyze Today's Meals
+  - Check Requirements
+  - Find Foods
+  - Compare Foods
+- Dark mode support (toggle in header)
+- Mobile-friendly responsive design
+- Typing indicators for better UX
+- Auto-scrolling chat messages
+
+### Option 2: Command-Line Interface (CLI) 💻
+
+Run the application in terminal:
 
 ```bash
 python main.py
@@ -155,25 +194,43 @@ python3 main.py
 ```
 foodnutrition/
 ├── agents/
-│   ├── advisor_agent.py       # Primary NutritionAdvisorAgent class
+│   ├── advisor_agent.py              # Primary NutritionAdvisorAgent class
 │   └── tools/
-│       └── nutrition_lookup_tool.py  # Nutrition lookup tool using RAG
+│       ├── nutrition_lookup_tool.py          # Nutrition lookup tool using RAG
+│       └── dietary_requirements_tool.py       # Dietary requirements lookup tool
 ├── config/
 │   ├── __init__.py
-│   └── config.py              # Application configuration
+│   └── config.py                      # Application configuration
 ├── data/
 │   ├── FoodData_Central_foundation_food_json_2025-04-24.json  # USDA dataset (340 food items)
-│   ├── process_usda_data.py   # Data processing for RAG (converts JSON to searchable documents)
-│   ├── vector_store.py        # ChromaDB vector store implementation (handles embeddings & search)
-│   └── vector_db/             # Vector database storage (created after setup, contains embeddings)
+│   ├── mineral_requirements.json      # Mineral requirements by age/gender
+│   ├── vitamin_recommendations.json   # Vitamin requirements by age/gender
+│   ├── nutrition_recommendations.json # Nutrition recommendations by age/gender
+│   ├── process_usda_data.py           # Data processing for RAG (USDA data)
+│   ├── process_dietary_data.py        # Data processing for dietary requirements
+│   ├── vector_store.py                # ChromaDB vector store (USDA nutrition data)
+│   ├── dietary_vector_store.py        # ChromaDB vector store (dietary requirements)
+│   ├── vector_db/                      # Vector database (USDA data)
+│   └── dietary_vector_db/              # Vector database (dietary requirements)
+├── web/
+│   ├── api.py                         # FastAPI backend
+│   ├── run_server.py                  # Web server startup script
+│   ├── templates/
+│   │   └── index.html                 # Main web page
+│   └── static/
+│       ├── css/
+│       │   └── style.css              # Stylesheet
+│       └── js/
+│           └── app.js                 # Frontend JavaScript
 ├── scripts/
-│   └── setup_rag.py           # RAG setup script
-├── tests/                     # Test files
-├── main.py                    # Application entry point
-├── requirements.txt           # Python dependencies
-├── .env.example               # Environment variables template
-├── .env                       # Your environment variables (not in git)
-└── README.md                  # This file
+│   └── setup_rag.py                   # RAG setup script (both vector databases)
+├── tests/                             # Test files
+├── main.py                            # CLI application entry point
+├── requirements.txt                   # Python dependencies
+├── .env.example                       # Environment variables template
+├── .env                               # Your environment variables (not in git)
+├── WEB_APP_DESIGN.md                  # Web app design documentation
+└── README.md                          # This file
 ```
 
 ## 🔧 Development
@@ -187,13 +244,24 @@ pytest tests/
 
 ### Code Structure
 
-- **`main.py`**: Entry point that initializes and runs the agent
+**Backend:**
+- **`main.py`**: CLI entry point that initializes and runs the agent
+- **`web/api.py`**: FastAPI backend for web interface
+- **`web/run_server.py`**: Web server startup script
 - **`agents/advisor_agent.py`**: Defines the `NutritionAdvisorAgent` class
 - **`agents/tools/nutrition_lookup_tool.py`**: Nutrition lookup tool using RAG
-- **`data/vector_store.py`**: ChromaDB vector store for nutrition data (handles full data loading from JSON)
+- **`agents/tools/dietary_requirements_tool.py`**: Dietary requirements lookup tool
+- **`data/vector_store.py`**: ChromaDB vector store for USDA nutrition data
+- **`data/dietary_vector_store.py`**: ChromaDB vector store for dietary requirements
 - **`data/process_usda_data.py`**: Processes USDA JSON into searchable documents
-- **`scripts/setup_rag.py`**: One-time setup script for RAG system
+- **`data/process_dietary_data.py`**: Processes dietary requirements JSON files
+- **`scripts/setup_rag.py`**: One-time setup script for both RAG systems
 - **`config/config.py`**: Manages application configuration and environment variables
+
+**Frontend:**
+- **`web/templates/index.html`**: Main web page with chat interface
+- **`web/static/css/style.css`**: Stylesheet with dark mode support
+- **`web/static/js/app.js`**: Frontend JavaScript for chat functionality
 
 ### RAG System Architecture
 
@@ -224,13 +292,21 @@ The application uses:
 
 ## 🛠️ Dependencies
 
+**Core:**
 - `spoon-ai-sdk`: Core SpoonOS agentic architecture framework
 - `spoon-toolkits`: Extended toolkits (optional)
 - `python-dotenv`: Environment variable management
+
+**RAG & Data Processing:**
 - `chromadb`: Vector database for RAG (local storage, no external service needed)
 - `sentence-transformers`: Local embedding generation (no API needed, downloads model on first use)
 - `pandas`: Data processing
 - `numpy`: Numerical operations
+
+**Web Framework:**
+- `fastapi`: Modern web framework for building APIs
+- `uvicorn`: ASGI server for FastAPI
+- `python-multipart`: For handling form data
 
 See `requirements.txt` for the complete list.
 
@@ -238,14 +314,17 @@ See `requirements.txt` for the complete list.
 
 ## 🚧 Future Enhancements
 
+- [x] Web interface with chat UI ✅
+- [x] Integration with USDA FoodData Central dataset (RAG implemented) ✅
+- [x] UK dietary requirements integration ✅
 - [ ] Meal planning
 - [ ] Daily nutrition tracking
 - [ ] User progress dashboard
 - [ ] Recipe recommendations based on deficiencies
 - [ ] Barcode scanning
-- [x] Integration with USDA FoodData Central dataset (RAG implemented)
-- [ ] UK dietary requirements integration
 - [ ] Local store search functionality
+- [ ] User profile persistence
+- [ ] Meal history tracking
 
 ## 📝 License
 
