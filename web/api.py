@@ -6,7 +6,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, List
-import asyncio
 import sys
 from pathlib import Path
 
@@ -41,9 +40,6 @@ async def lifespan(app: FastAPI):
         raise
     
     yield
-    
-    # Shutdown (if needed)
-    # Cleanup code can go here
 
 
 app = FastAPI(
@@ -129,7 +125,7 @@ async def chat(message: ChatMessage):
 @app.post("/api/profile")
 async def update_profile(profile: UserProfile):
     """Update user profile (placeholder for future implementation)."""
-    # TODO: Implement profile storage in memory/database
+    # Profile storage will be implemented in a future update
     return {"status": "success", "message": "Profile updated"}
 
 

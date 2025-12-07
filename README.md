@@ -26,7 +26,7 @@ The application follows the **xspoon agentic architecture**, consisting of:
 
 ### Sub-Agents / Tools
 1. **Nutrition Lookup Tool** ✅: Queries USDA FoodData Central dataset using RAG
-2. **Dietary Requirements Tool** (Planned): Fetches recommended nutrient intake based on age and gender
+2. **Dietary Requirements Tool** ✅: Fetches recommended nutrient intake based on age and gender
 3. **Recommendation Agent** (Planned): Suggests alternative foods to improve deficient nutrients
 4. **Comparison Agent** (Planned): Compares dishes nutritionally
 5. **Local Store Search Tool** (Planned): Finds nearby shops and supermarkets
@@ -216,8 +216,11 @@ The application uses:
   - Processed and indexed using RAG for semantic search
   - Supports queries by food name, nutrient name, or nutritional properties
   - Full nutritional data available for each food item (calories, protein, vitamins, minerals, etc.)
-- **UK Government Dietary Recommendations** (Planned): [Reference](https://www.nutrition.org.uk/nutritional-information/nutrient-requirements/)
-- **Government Dietary Recommendations PDF** (Planned): [Download](https://assets.publishing.service.gov.uk/media/5a749fece5274a44083b82d8/government_dietary_recommendations.pdf)
+- **UK Government Dietary Recommendations** ✅: Age and gender-specific nutrient requirements
+  - Minerals (iron, calcium, magnesium, etc.)
+  - Vitamins (A, B-complex, C, D, etc.)
+  - Macronutrients (protein, carbs, fats, fiber)
+  - Stored in JSON format and accessible via Dietary Requirements Tool
 
 ## 🛠️ Dependencies
 
