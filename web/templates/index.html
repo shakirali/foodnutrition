@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Advisor - AI-Powered Nutrition Guidance</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🥗</span>
+                    <span class="logo-text">Nutrition Advisor</span>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-button" id="theme-toggle" aria-label="Toggle dark mode">
+                        <span>🌙</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Chat Container -->
+            <div class="chat-container" id="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Welcome message will be added here -->
+                </div>
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea 
+                            id="chat-input" 
+                            class="chat-input" 
+                            placeholder="Type your message here..."
+                            rows="1"
+                        ></textarea>
+                        <button id="send-button" class="send-button" aria-label="Send message">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-content">
+                    <h3 class="sidebar-title">Quick Actions</h3>
+                    <div class="quick-actions">
+                        <button class="action-button" data-action="analyze-meals">
+                            <span class="action-icon">📊</span>
+                            <span class="action-text">Analyze Today's Meals</span>
+                        </button>
+                        <button class="action-button" data-action="check-requirements">
+                            <span class="action-icon">📋</span>
+                            <span class="action-text">Check Requirements</span>
+                        </button>
+                        <button class="action-button" data-action="find-foods">
+                            <span class="action-icon">🔍</span>
+                            <span class="action-text">Find Foods</span>
+                        </button>
+                        <button class="action-button" data-action="compare-foods">
+                            <span class="action-icon">⚖️</span>
+                            <span class="action-text">Compare Foods</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processing your request...</p>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
+
