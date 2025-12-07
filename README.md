@@ -244,17 +244,6 @@ See `requirements.txt` for the complete list.
 - [ ] UK dietary requirements integration
 - [x] Local store search functionality
 
-## 📝 License
-
-[Add your license here]
-
-## 🤝 Contributing
-
-[Add contribution guidelines here]
-
-## 📧 Contact
-
-[Add contact information here]
 
 ## 🙏 Acknowledgments
 
