@@ -38,6 +38,12 @@ class AppConfig:
     GOOGLE_API_KEY: Optional[str] = os.getenv("GOOGLE_API_KEY")
     GOOGLE_SEARCH_ENGINE_ID: Optional[str] = os.getenv("GOOGLE_SEARCH_ENGINE_ID")
     
+    # ElevenLabs Configuration
+    ELEVENLABS_API_KEY: Optional[str] = os.getenv("ELEVENLABS_API_KEY")
+    ELEVENLABS_VOICE_ID: Optional[str] = os.getenv("ELEVENLABS_VOICE_ID")
+    ELEVENLABS_OUTPUT_FORMAT: Optional[str] = os.getenv("ELEVENLABS_OUTPUT_FORMAT")
+    ELEVENLABS_MODEL_ID: Optional[str] = os.getenv("ELEVENLABS_MODEL_ID")
+    
     @classmethod
     def validate(cls) -> bool:
         """
@@ -67,5 +73,9 @@ Configuration Summary:
   - Data Directory: {cls.DATA_DIR}
   - Memory Enabled: {cls.MEMORY_ENABLED}
   - Google API Key: {'Set' if cls.GOOGLE_API_KEY else 'Not set'}
+  - ElevenLabs API Key: {'Set' if cls.ELEVENLABS_API_KEY else 'Not set'}
+  - ElevenLabs Voice ID: {'Set' if cls.ELEVENLABS_VOICE_ID else 'Not set'}
+  - ElevenLabs Output Format: {'Set' if cls.ELEVENLABS_OUTPUT_FORMAT else 'Not set'}
+  - ElevenLabs Model ID: {'Set' if cls.ELEVENLABS_MODEL_ID else 'Not set'}
 """
 

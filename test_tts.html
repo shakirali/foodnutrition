@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Endpoint Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        audio {
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>TTS Endpoint Test</h1>
+    
+    <div>
+        <label for="textInput">Enter text to convert:</label>
+        <textarea id="textInput" placeholder="Enter text here...">Hello, this is a test of the text to speech endpoint.</textarea>
+    </div>
+    
+    <button id="testBtn" onclick="testTTS()">Convert to Speech</button>
+    
+    <div id="status"></div>
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+    
+    <script>
+        async function testTTS() {
+            const textInput = document.getElementById('textInput');
+            const testBtn = document.getElementById('testBtn');
+            const statusDiv = document.getElementById('status');
+            const audioPlayer = document.getElementById('audioPlayer');
+            
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                statusDiv.className = 'error';
+                statusDiv.textContent = 'Error: Text cannot be empty';
+                return;
+            }
+            
+            testBtn.disabled = true;
+            statusDiv.className = '';
+            statusDiv.textContent = 'Converting...';
+            audioPlayer.style.display = 'none';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/tts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                if (response.ok) {
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+                    
+                    statusDiv.className = 'success';
+                    statusDiv.textContent = `✓ Success! Audio generated (${(audioBlob.size / 1024).toFixed(2)} KB)`;
+                } else {
+                    const error = await response.json();
+                    statusDiv.className = 'error';
+                    statusDiv.textContent = `✗ Error ${response.status}: ${error.detail || 'Unknown error'}`;
+                }
+            } catch (error) {
+                statusDiv.className = 'error';
+                statusDiv.textContent = `✗ Network error: ${error.message}`;
+            } finally {
+                testBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+
