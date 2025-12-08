@@ -279,13 +279,16 @@ class NutritionAdvisorApp {
                 this.currentAudio = null;
             }
 
+        // Strip markdown before sending to TTS
+        const plainText = this.stripMarkdown(text);
+
         // Call TTS endpoint
         const response = await fetch(`${this.apiBase}/tts`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ text: text }),
+            body: JSON.stringify({ text: plainText }),
         });
 
         if (!response.ok) {
@@ -313,6 +316,57 @@ class NutritionAdvisorApp {
         } catch (error) {
             console.error('Error playing audio:', error);
         }
+    }
+
+    stripMarkdown(markdownText) {
+        if (typeof marked === 'undefined') {
+            // Fallback: simple regex stripping
+            return this.simpleMarkdownStrip(markdownText);
+        }
+        
+        try {
+            // Parse markdown to HTML
+            const html = marked.parse(markdownText);
+            
+            // Create temporary DOM element to extract text
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // Get plain text content (strips all HTML tags)
+            let plainText = tempDiv.textContent || tempDiv.innerText || '';
+            
+            // Clean up extra whitespace and normalize
+            plainText = plainText
+                .replace(/\n{3,}/g, '\n\n')      // Max 2 consecutive newlines
+                .replace(/[ \t]+/g, ' ')          // Multiple spaces to single space
+                .replace(/\s+$/gm, '')            // Trailing whitespace on each line
+                .trim();
+            
+            return plainText;
+        } catch (error) {
+            console.warn('Error stripping markdown, using fallback:', error);
+            return this.simpleMarkdownStrip(markdownText);
+        }
+    }
+
+    simpleMarkdownStrip(text) {
+        // Fallback regex-based stripping
+        return text
+            .replace(/```[\s\S]*?```/g, '')           // Code blocks
+            .replace(/`([^`]+)`/g, '$1')               // Inline code
+            .replace(/^#{1,6}\s+(.+)$/gm, '$1')        // Headers
+            .replace(/\*\*([^*]+)\*\*/g, '$1')         // Bold
+            .replace(/\*([^*]+)\*/g, '$1')             // Italic
+            .replace(/__([^_]+)__/g, '$1')             // Bold (alt)
+            .replace(/_([^_]+)_/g, '$1')               // Italic (alt)
+            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')  // Links
+            .replace(/^>\s+(.+)$/gm, '$1')             // Blockquotes
+            .replace(/^[\*\-\+]\s+(.+)$/gm, '$1')      // Unordered lists
+            .replace(/^\d+\.\s+(.+)$/gm, '$1')         // Ordered lists
+            .replace(/^---+$/gm, '')                   // Horizontal rules
+            .replace(/\n{3,}/g, '\n\n')                 // Multiple newlines
+            .replace(/[ \t]+/g, ' ')                   // Multiple spaces
+            .trim();
     }
 
     initSpeechRecognition() {
