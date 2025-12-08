@@ -22,3 +22,6 @@ python-multipart>=0.0.6
 
 elevenlabs
 
+# Tavily Search SDK
+tavily-python>=0.3.0
+

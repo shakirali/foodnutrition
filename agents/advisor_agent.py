@@ -8,6 +8,7 @@ from spoon_ai.agents.toolcall import ToolCallAgent
 from spoon_ai.tools import ToolManager
 from agents.tools.nutrition_lookup_tool import NutritionLookupTool
 from agents.tools.dietary_requirements_tool import DietaryRequirementsTool
+from agents.tools.tavily_search_tool import TavilySearchTool
 
 
 class NutritionAdvisorAgent(ToolCallAgent):
@@ -55,7 +56,7 @@ class NutritionAdvisorAgent(ToolCallAgent):
       1. Use NutritionLookupTool to find the nutritional values of foods they mentioned
       2. If you have their profile (age, gender), use DietaryRequirementsTool to get their daily requirements
       3. Compare their meal intake with their requirements and provide insights
-      4. If food is not found in the database, search the internet for that food's nutritional information
+      4. If food is not found in the database, use tavily_search_tool to search the internet for that food's nutritional information
     
     - If the user asks about their daily nutrition needs (e.g., "How much nutrition do I need per day?"):
       1. If you don't have their profile yet, ask for their age and gender first
@@ -65,7 +66,7 @@ class NutritionAdvisorAgent(ToolCallAgent):
     
     - If the user asks about specific food nutrition (e.g., "What nutrients are in an apple?"):
       1. Use NutritionLookupTool to find the nutritional information
-      2. If not found in the database, search the internet for that food
+      2. If not found in the database, use tavily_search_tool to search the internet for that food's nutritional information
       3. Explain why this food is good for them and how it fits into a balanced diet
     
     - If the user wants to compare foods or find foods rich in nutrients:
@@ -87,6 +88,14 @@ class NutritionAdvisorAgent(ToolCallAgent):
     - User mentions foods they ate and you need nutrition data
     - User wants to find foods rich in specific nutrients
     - User wants to compare different foods nutritionally
+    
+    **tavily_search_tool** - Use when:
+    - Food is not found in the NutritionLookupTool database and you need to search the internet
+    - User asks about current nutrition trends, recent research, or up-to-date information
+    - You need to find information about foods, recipes, or nutrition facts that aren't in the local database
+    - User asks about specific brands, products, or restaurant items not in the database
+    - You need to verify or supplement information from the database with current web sources
+    - Always try NutritionLookupTool first, then use tavily_search_tool as a fallback
     
     **Communication Style:**
     - Be conversational, empathetic, enthusiastic, and genuinely helpful
@@ -115,7 +124,8 @@ class NutritionAdvisorAgent(ToolCallAgent):
     available_tools: ToolManager = Field(
         default_factory=lambda: ToolManager([
             NutritionLookupTool(),
-            DietaryRequirementsTool()
+            DietaryRequirementsTool(),
+            TavilySearchTool()
         ])
     )
 

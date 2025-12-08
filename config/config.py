@@ -44,6 +44,9 @@ class AppConfig:
     ELEVENLABS_OUTPUT_FORMAT: Optional[str] = os.getenv("ELEVENLABS_OUTPUT_FORMAT")
     ELEVENLABS_MODEL_ID: Optional[str] = os.getenv("ELEVENLABS_MODEL_ID")
     
+    # Tavily Search Configuration
+    TAVILY_API_KEY: Optional[str] = os.getenv("TAVILY_API_KEY")
+    
     @classmethod
     def validate(cls) -> bool:
         """
@@ -77,5 +80,6 @@ Configuration Summary:
   - ElevenLabs Voice ID: {'Set' if cls.ELEVENLABS_VOICE_ID else 'Not set'}
   - ElevenLabs Output Format: {'Set' if cls.ELEVENLABS_OUTPUT_FORMAT else 'Not set'}
   - ElevenLabs Model ID: {'Set' if cls.ELEVENLABS_MODEL_ID else 'Not set'}
+  - Tavily API Key: {'Set' if cls.TAVILY_API_KEY else 'Not set'}
 """
 
