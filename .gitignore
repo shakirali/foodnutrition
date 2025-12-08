@@ -64,3 +64,5 @@ htmlcov/
 # SpoonOS
 .spoon/
 
+# Editor files
+.cursorrules
