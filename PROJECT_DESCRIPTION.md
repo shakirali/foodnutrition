@@ -1,0 +1,4 @@
+# Project Description
+
+The Nutrition-Based Local Food Advisor App is an AI agent-powered application that provides personalized nutrition guidance using verified scientific data. Built on the SpoonOS agentic architecture, it integrates USDA FoodData Central nutritional database (340+ food items) and UK government dietary recommendations to deliver age and gender-specific nutrition advice. The application uses RAG (Retrieval-Augmented Generation) technology with local vector database processing for efficient semantic search of nutritional information. Users can track daily meal intake, compare it against recommended requirements, and receive personalized food recommendations. The system offers both web and CLI interfaces, with a modern chat-based UI that supports real-time interactions, dark mode, and mobile responsiveness.
+

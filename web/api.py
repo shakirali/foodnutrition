@@ -51,7 +51,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -124,8 +124,8 @@ async def chat(message: ChatMessage):
 
 @app.post("/api/profile")
 async def update_profile(profile: UserProfile):
-    """Update user profile (placeholder for future implementation)."""
-    # Profile storage will be implemented in a future update
+    """Update user profile."""
+    # Profile storage implementation pending
     return {"status": "success", "message": "Profile updated"}
 
 
@@ -136,9 +136,4 @@ async def health_check():
         "status": "healthy",
         "agent_initialized": agent is not None
     }
-
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
