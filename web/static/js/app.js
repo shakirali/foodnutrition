@@ -5,12 +5,19 @@ class NutritionAdvisorApp {
         this.apiBase = '/api';
         this.sessionId = this.generateSessionId();
         this.chatMessages = [];
+        this.voiceEnabled = false;
+        this.currentAudio = null;
+        this.recognition = null;
+        this.isRecording = false;
+        this.speechSupported = false;
         this.init();
     }
 
     init() {
         this.setupEventListeners();
         this.loadTheme();
+        this.loadVoiceSetting();
+        this.initSpeechRecognition();
         this.showWelcomeMessage();
     }
 
@@ -22,6 +29,8 @@ class NutritionAdvisorApp {
         const sendButton = document.getElementById('send-button');
         const chatInput = document.getElementById('chat-input');
         const themeToggle = document.getElementById('theme-toggle');
+        const voiceToggle = document.getElementById('voice-toggle');
+        const micButton = document.getElementById('mic-button');
 
         // Send message on button click
         sendButton.addEventListener('click', () => this.sendMessage());
@@ -42,6 +51,12 @@ class NutritionAdvisorApp {
 
         // Theme toggle
         themeToggle.addEventListener('click', () => this.toggleTheme());
+
+        // Voice toggle
+        voiceToggle.addEventListener('click', () => this.toggleVoice());
+
+        // Microphone button
+        micButton.addEventListener('click', () => this.toggleSpeechRecognition());
 
         // Quick action buttons
         document.querySelectorAll('.action-button').forEach(button => {
@@ -114,6 +129,11 @@ class NutritionAdvisorApp {
                 timestamp: new Date()
             });
 
+            // Play audio if voice is enabled
+            if (this.voiceEnabled) {
+                await this.playAudioResponse(data.response);
+            }
+
         } catch (error) {
             console.error('Error sending message:', error);
             this.hideTypingIndicator();
@@ -134,7 +154,15 @@ class NutritionAdvisorApp {
 
         const bubble = document.createElement('div');
         bubble.className = 'message-bubble';
-        bubble.textContent = message.text;
+        
+        // Parse markdown if it's an agent message, otherwise use plain text
+        if (message.type === 'agent' && typeof marked !== 'undefined') {
+            // Use marked.js to parse markdown to HTML
+            bubble.innerHTML = marked.parse(message.text);
+        } else {
+            // Use plain text for user messages (or if marked.js not available)
+            bubble.textContent = message.text;
+        }
 
         const timestamp = document.createElement('div');
         timestamp.className = 'message-timestamp';
@@ -206,6 +234,231 @@ class NutritionAdvisorApp {
         this.updateThemeIcon(newTheme);
     }
 
+    toggleVoice() {
+        this.voiceEnabled = !this.voiceEnabled;
+        // Stop audio if disabling voice
+        if (!this.voiceEnabled && this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio = null;
+        }
+        this.updateVoiceIcon();
+        this.saveVoiceSetting();
+    }
+
+    updateVoiceIcon() {
+        const voiceToggle = document.getElementById('voice-toggle');
+        const voiceIcon = document.getElementById('voice-icon');
+        
+        if (this.voiceEnabled) {
+            voiceIcon.textContent = '🔊';
+            voiceToggle.classList.add('active');
+            voiceToggle.setAttribute('title', 'Voice responses enabled');
+        } else {
+            voiceIcon.textContent = '🔇';
+            voiceToggle.classList.remove('active');
+            voiceToggle.setAttribute('title', 'Voice responses disabled');
+        }
+    }
+
+    loadVoiceSetting() {
+        const saved = localStorage.getItem('voiceEnabled');
+        if (saved !== null) {
+            this.voiceEnabled = saved === 'true';
+        }
+        this.updateVoiceIcon();
+    }
+
+    saveVoiceSetting() {
+        localStorage.setItem('voiceEnabled', this.voiceEnabled.toString());
+    }
+
+    async playAudioResponse(text) {
+        try {
+            if (this.currentAudio) {
+                this.currentAudio.pause();
+                this.currentAudio = null;
+            }
+
+        // Call TTS endpoint
+        const response = await fetch(`${this.apiBase}/tts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: text }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        this.currentAudio = audio;
+
+        audio.addEventListener('ended', () => {
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        });
+
+        audio.addEventListener('error', (e) => {
+            console.error('Audio playback error:', e);
+            URL.revokeObjectURL(audioUrl);
+            this.currentAudio = null;
+        });
+
+        await audio.play();
+
+        } catch (error) {
+            console.error('Error playing audio:', error);
+        }
+    }
+
+    initSpeechRecognition() {
+        // Check for browser support
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!SpeechRecognition) {
+            console.warn('Speech recognition not supported in this browser');
+            this.speechSupported = false;
+            // Optionally hide or disable microphone button
+            const micButton = document.getElementById('mic-button');
+            if (micButton) {
+                micButton.style.display = 'none';
+            }
+            return;
+        }
+        
+        this.speechSupported = true;
+        
+        // Initialize recognition
+        this.recognition = new SpeechRecognition();
+        
+        // Configure recognition settings
+        this.recognition.continuous = false;  // Stop after first result
+        this.recognition.interimResults = false;  // Only return final results
+        this.recognition.lang = 'en-US';  // Set language (can be made configurable)
+        
+        // Set up event handlers
+        this.recognition.onstart = () => {
+            this.isRecording = true;
+            this.updateMicButton();
+        };
+        
+        this.recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            this.handleSpeechResult(transcript);
+        };
+        
+        this.recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            this.handleSpeechError(event.error);
+        };
+        
+        this.recognition.onend = () => {
+            this.isRecording = false;
+            this.updateMicButton();
+        };
+    }
+
+    toggleSpeechRecognition() {
+        if (!this.speechSupported || !this.recognition) {
+            alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
+            return;
+        }
+        
+        if (this.isRecording) {
+            // Stop recording
+            this.recognition.stop();
+        } else {
+            // Start recording
+            try {
+                this.recognition.start();
+            } catch (error) {
+                // Handle case where recognition is already running
+                if (error.name === 'InvalidStateError') {
+                    console.warn('Recognition already started');
+                } else {
+                    console.error('Error starting recognition:', error);
+                }
+            }
+        }
+    }
+
+    handleSpeechResult(transcript) {
+        // Clean up transcript (remove extra spaces, capitalize first letter)
+        const cleanedTranscript = transcript.trim();
+        
+        if (!cleanedTranscript) {
+            return;  // Ignore empty results
+        }
+        
+        // Set the transcript in the input field
+        const chatInput = document.getElementById('chat-input');
+        chatInput.value = cleanedTranscript;
+        
+        // Auto-resize textarea
+        chatInput.style.height = 'auto';
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        
+        // Optional: Automatically send the message
+        // Uncomment the line below if you want auto-send
+        // this.sendMessage();
+        
+        // Or just focus the input so user can review/edit before sending
+        chatInput.focus();
+    }
+
+    handleSpeechError(error) {
+        this.isRecording = false;
+        this.updateMicButton();
+        
+        let errorMessage = 'Speech recognition error. ';
+        
+        switch (error) {
+            case 'no-speech':
+                errorMessage += 'No speech detected. Please try again.';
+                break;
+            case 'audio-capture':
+                errorMessage += 'No microphone found. Please check your microphone.';
+                break;
+            case 'not-allowed':
+                errorMessage += 'Microphone permission denied. Please allow microphone access.';
+                break;
+            case 'network':
+                errorMessage += 'Network error. Please check your connection.';
+                break;
+            case 'aborted':
+                // User stopped recording - not really an error
+                return;
+            default:
+                errorMessage += `Unknown error: ${error}`;
+        }
+        
+        // Show error to user (you can customize this)
+        console.error(errorMessage);
+        // Optionally show a toast notification or alert
+        // alert(errorMessage);
+    }
+
+    updateMicButton() {
+        const micButton = document.getElementById('mic-button');
+        const micIcon = document.getElementById('mic-icon');
+        
+        if (!micButton || !micIcon) return;
+        
+        if (this.isRecording) {
+            micButton.classList.add('recording');
+            micButton.setAttribute('title', 'Recording... Click to stop');
+            micIcon.textContent = '🔴';  // Red circle when recording
+        } else {
+            micButton.classList.remove('recording');
+            micButton.setAttribute('title', 'Click to speak');
+            micIcon.textContent = '🎤';  // Microphone icon when not recording
+        }
+    }
+        
     loadTheme() {
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);

@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -19,6 +21,9 @@
                     <span class="logo-text">Nutrition Advisor</span>
                 </div>
                 <div class="header-actions">
+                    <button class="icon-button" id="voice-toggle" aria-label="Toggle voice responses" title="Toggle voice responses">
+                        <span id="voice-icon">🔇</span>
+                    </button>
                     <button class="icon-button" id="theme-toggle" aria-label="Toggle dark mode">
                         <span>🌙</span>
                     </button>
@@ -41,6 +46,9 @@
                             placeholder="Type your message here..."
                             rows="1"
                         ></textarea>
+                        <button id="mic-button" class="icon-button mic-button" aria-label="Start voice input" title="Click to speak">
+                            <span id="mic-icon">🎤</span>
+                        </button>
                         <button id="send-button" class="send-button" aria-label="Send message">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M18 2L9 11M18 2L12 18L9 11M18 2L2 8L9 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
